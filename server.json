@@ -1,0 +1,59 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.ArionPay-Dev/arionpay-mcp",
+  "title": "ArionPay",
+  "description": "Search the ArionPay crypto payment docs, and create and check invoices for your store. Payments go straight to your own wallet.",
+  "repository": {
+    "url": "https://github.com/ArionPay-Dev/arionpay-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://arionpay.com",
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@arionpay/mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "ARIONPAY_API_KEY",
+          "description": "Your store API key (pk_...). Leave out for the docs tools only.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false
+        },
+        {
+          "name": "ARIONPAY_API_SECRET",
+          "description": "Your store API secret (sk_...). Needed together with the API key.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true
+        },
+        {
+          "name": "ARIONPAY_LIVE",
+          "description": "true allows real invoices when asked for. Default: test invoices only.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false
+        },
+        {
+          "name": "ARIONPAY_MAX_AMOUNT",
+          "description": "Largest real invoice, in the invoice's currency. Default 1000.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false
+        },
+        {
+          "name": "ARIONPAY_READ_ONLY",
+          "description": "true leaves out every tool that creates or changes something.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}

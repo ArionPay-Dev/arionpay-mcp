@@ -1,0 +1,61 @@
+{
+  "name": "@arionpay/mcp",
+  "version": "1.0.0",
+  "mcpName": "io.github.ArionPay-Dev/arionpay-mcp",
+  "description": "Official ArionPay MCP server: let AI assistants (Claude, Cursor, VS Code and others) search the ArionPay docs, and create and check crypto invoices for your store. Payments go straight to your own wallet.",
+  "keywords": [
+    "arionpay",
+    "mcp",
+    "model-context-protocol",
+    "ai-agents",
+    "claude",
+    "cursor",
+    "crypto",
+    "payments",
+    "usdt",
+    "invoice"
+  ],
+  "homepage": "https://github.com/ArionPay-Dev/arionpay-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArionPay-Dev/arionpay-mcp.git"
+  },
+  "bugs": "https://github.com/ArionPay-Dev/arionpay-mcp/issues",
+  "license": "MIT",
+  "author": "ArionPay",
+  "type": "module",
+  "bin": {
+    "arionpay-mcp": "dist/stdio.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-snapshot.mjs",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "docs-snapshot": "node scripts/build-docs-snapshot.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "5.9.3"
+  }
+}
