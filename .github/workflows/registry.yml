@@ -1,0 +1,69 @@
+name: Publish to MCP Registry
+
+# Lists this server in the official MCP Registry (registry.modelcontextprotocol.io) as
+# io.github.ArionPay-Dev/arionpay-mcp, using GitHub OIDC (no stored secret). It runs on a published
+# GitHub release and waits until that version is live on npm (npm releases are staged and approved
+# by a maintainer with 2FA). If the approval comes later, run this workflow again by hand:
+# Actions -> Publish to MCP Registry -> Run workflow.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  registry:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # GitHub OIDC login to the MCP Registry
+      contents: read
+    env:
+      MCP_PUBLISHER_VERSION: v1.8.1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+      - name: server.json matches package.json
+        run: |
+          node -e '
+            const p = require("./package.json"), s = require("./server.json");
+            if (s.name !== p.mcpName || s.version !== p.version || s.packages[0].version !== p.version || s.packages[0].identifier !== p.name) {
+              console.error("server.json does not match package.json"); process.exit(1);
+            }'
+      - name: Wait until this version is live on npm (approve the staged version on npmjs.com)
+        run: |
+          v=$(node -p "require('./package.json').version")
+          for i in $(seq 1 50); do
+            if npm view "@arionpay/mcp@$v" version >/dev/null 2>&1; then echo "@arionpay/mcp@$v is live on npm"; exit 0; fi
+            echo "waiting for @arionpay/mcp@$v on npm ($i/50)"; sleep 60
+          done
+          echo "::error::@arionpay/mcp@$v is not live on npm yet. Approve it on npmjs.com (Staged packages), then run this workflow again."
+          exit 1
+      - name: Install cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+      - name: Download and verify mcp-publisher
+        run: |
+          set -euo pipefail
+          os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+          arch="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
+          archive="mcp-publisher_${os}_${arch}.tar.gz"
+          base_url="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}"
+          curl --fail --location --silent --show-error --output "$archive" "$base_url/$archive"
+          curl --fail --location --silent --show-error --output "$archive.sigstore.json" "$base_url/$archive.sigstore.json"
+          cosign verify-blob \
+            --bundle "$archive.sigstore.json" \
+            --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/${MCP_PUBLISHER_VERSION}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            "$archive"
+          tar xzf "$archive" mcp-publisher
+          rm -f "$archive" "$archive.sigstore.json"
+      - name: Log in to the MCP Registry (GitHub OIDC)
+        run: ./mcp-publisher login github-oidc
+      - name: Publish to the MCP Registry
+        run: ./mcp-publisher publish

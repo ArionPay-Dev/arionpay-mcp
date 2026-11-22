@@ -142,3 +142,16 @@ test("API errors come back as tool errors with a hint, never as a crash", async 
   assert.ok(bad.isError);
   await t.close();
 });
+
+test("one version everywhere: package.json, server.json (twice) and the server", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { VERSION } = await import("../dist/index.js");
+  const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+  const reg = JSON.parse(readFileSync(new URL("../server.json", import.meta.url), "utf8"));
+  assert.equal(VERSION, pkg.version);
+  assert.equal(reg.version, pkg.version);
+  assert.equal(reg.packages[0].version, pkg.version);
+  assert.equal(reg.name, pkg.mcpName);
+  assert.equal(reg.packages[0].identifier, pkg.name);
+  assert.ok(reg.description.length <= 100, "registry limit: 100 characters");
+});

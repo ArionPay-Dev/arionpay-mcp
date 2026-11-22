@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+- Listed in the official MCP Registry as `io.github.ArionPay-Dev/arionpay-mcp` (published from GitHub Actions).
+- Published from GitHub with npm trusted publishing (staged: each version is approved by a maintainer with 2FA) and provenance.
+- The server version is read from package.json.
+
 ## 1.0.0
 
 First release.

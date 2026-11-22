@@ -14,6 +14,7 @@
  * another address); there is no tool for wallets, secrets, payouts or marking an invoice paid.
  */
 import { randomBytes } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
@@ -21,7 +22,8 @@ import { ArionPayApiError, ArionPayClient } from "./client.js";
 import type { Config } from "./config.js";
 import { DocsIndex, loadSnapshot, pageText, type DocsSnapshot } from "./docs.js";
 
-export const VERSION = "1.0.0";
+/** From package.json, so the version is written in one place (server.json is checked against it by the tests). */
+export const VERSION: string = (JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string }).version;
 
 export const SCENARIOS = ["detected", "confirm", "exact", "underpaid_1pct", "underpaid_5pct", "overpaid", "partial_half", "late"] as const;
 export const EVENTS = ["invoice.paid", "invoice.pending", "invoice.partial", "invoice.expired", "invoice.needs_review"] as const;

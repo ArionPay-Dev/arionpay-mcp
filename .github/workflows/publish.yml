@@ -1,9 +1,11 @@
 name: Publish to npm
 
 # Every push and pull request installs, builds and tests the package and packs the tarball.
-# Only a published GitHub release (or a manual run) publishes that tarball to npm,
-# through npm trusted publishing: no npm token is stored anywhere, and npm adds a
-# provenance statement linking the package to this repository and workflow.
+# Only a published GitHub release (or a manual run) sends that tarball to npm, through npm
+# trusted publishing (no npm token is stored anywhere; npm adds a provenance statement).
+# It is STAGED: the version goes live only after a maintainer approves it on npmjs.com
+# (@arionpay/mcp -> Staged packages) with 2FA. The MCP Registry listing (registry.yml)
+# waits until the version is live.
 
 on:
   push:
@@ -63,9 +65,11 @@ jobs:
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-      - name: npm 11.15 or newer (trusted publishing)
+      - name: npm 11.21 or newer (trusted publishing, staged publishing)
         run: |
           npm install -g npm@11
           npm --version
-      - name: Publish
-        run: npm publish ./out/*.tgz --access public
+      - name: Stage for publishing (a maintainer approves it on npmjs.com with 2FA)
+        run: |
+          npm stage publish ./out/*.tgz --access public
+          echo "Staged. Approve it on https://www.npmjs.com/package/@arionpay/mcp (Staged packages) to make it live." >> "$GITHUB_STEP_SUMMARY"

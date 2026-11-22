@@ -1,6 +1,6 @@
 {
   "name": "@arionpay/mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "mcpName": "io.github.ArionPay-Dev/arionpay-mcp",
   "description": "Official ArionPay MCP server: let AI assistants (Claude, Cursor, VS Code and others) search the ArionPay docs, and create and check crypto invoices for your store. Payments go straight to your own wallet.",
   "keywords": [
